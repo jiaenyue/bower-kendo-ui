@@ -1,21 +1,15 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
-    define([ "./kendo.mobile.view", "./kendo.mobile.loader" ], f);
+    define([ "./kendo.mobile.view.js", "./kendo.mobile.loader" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "mobile.pane",
+    name: "Pane",
+    category: "mobile",
+    description: "Mobile Pane",
+    depends: [ "mobile.view", "mobile.loader" ],
+    hidden: true
+};
 
 (function($, undefined) {
     var kendo = window.kendo,
@@ -107,39 +101,41 @@
                 serverNavigation: options.serverNavigation,
                 remoteViewURLPrefix: options.root || "",
                 layout: options.layout,
-                loader: that.loader
-            });
+                $angular: options.$angular,
+                loader: that.loader,
 
-            that.viewEngine.bind("showStart", function() {
-                that.loader.transition();
-                that.closeActiveDialogs();
-            });
+                showStart: function() {
+                    that.loader.transition();
+                    that.closeActiveDialogs();
+                },
 
-            that.viewEngine.bind("after", function(e) {
-                that.loader.transitionDone();
-            });
+                after: function(e) {
+                    that.loader.transitionDone();
+                },
 
-            that.viewEngine.bind(VIEW_SHOW, function(e) {
-                that.trigger(VIEW_SHOW, e);
-            });
+                viewShow: function(e) {
+                    that.trigger(VIEW_SHOW, e);
+                },
 
-            that.viewEngine.bind("loadStart", function() {
-                that.loader.show();
-            });
+                loadStart: function() {
+                    that.loader.show();
+                },
 
-            that.viewEngine.bind("loadComplete", function() {
-                that.loader.hide();
-            });
+                loadComplete: function() {
+                    that.loader.hide();
+                },
 
-            that.viewEngine.bind(SAME_VIEW_REQUESTED, function() {
-                that.trigger(SAME_VIEW_REQUESTED);
-            });
+                sameViewRequested: function() {
+                    that.trigger(SAME_VIEW_REQUESTED);
+                },
 
-            that.viewEngine.bind("viewTypeDetermined", function(e) {
-                if (!e.remote || !that.options.serverNavigation)  {
-                    that.trigger(NAVIGATE, { url: e.url });
+                viewTypeDetermined: function(e) {
+                    if (!e.remote || !that.options.serverNavigation)  {
+                        that.trigger(NAVIGATE, { url: e.url });
+                    }
                 }
             });
+
 
             this._setPortraitWidth();
 
@@ -214,8 +210,7 @@
 
         bindToRouter: function(router) {
             var that = this,
-                options = that.options,
-                initial = options.initial,
+                history = this.history,
                 viewEngine = this.viewEngine;
 
             router.bind("init", function(e) {
@@ -224,8 +219,11 @@
 
                 viewEngine.rootView.attr(kendo.attr("url"), attrUrl);
 
-                if (url === "/" && initial) {
-                    router.navigate(initial, true);
+                // if current is set, then this means that the pane has navigated to a given view - we need to update the router accordingly.
+                var length = history.length;
+
+                if (url === "/" && length) {
+                    router.navigate(history[length - 1], true);
                     e.preventDefault(); // prevents from executing routeMissing, by default
                 }
             });

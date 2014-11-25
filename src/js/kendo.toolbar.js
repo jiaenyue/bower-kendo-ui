@@ -1,21 +1,14 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
     define([ "./kendo.core" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "toolbar",
+    name: "ToolBar",
+    category: "web",
+    description: "The ToolBar widget displays one or more command buttons divided into groups.",
+    depends: [ "core" ]
+};
 
 (function($, undefined) {
     var kendo = window.kendo,
@@ -31,6 +24,7 @@
         BUTTON_GROUP = "k-button-group",
         SPLIT_BUTTON = "k-split-button",
         SEPARATOR = "k-separator",
+        POPUP = "k-popup",
 
         RESIZABLE_TOOLBAR = "k-toolbar-resizable",
         STATE_ACTIVE = "k-state-active",
@@ -79,6 +73,14 @@
                     var items = options.buttons,
                         item;
 
+                    if (!items) {
+                        return;
+                    }
+
+                    if (options.attributes) {
+                        element.attr(options.attributes);
+                    }
+
                     element.data({ type: "buttonGroup" });
                     element.attr(KENDO_UID_ATTR, options.uid);
 
@@ -94,8 +96,11 @@
                     element.children().last().addClass(GROUP_END);
                 },
                 toolbar: function (options) {
-                    var element = $('<div class="' + BUTTON_GROUP + '"></div>');
+                    var element = $('<div></div>');
+
                     components.buttonGroup.base(options, components.button.toolbar, element);
+
+                    element.addClass(BUTTON_GROUP);
 
                     if (options.align) {
                         element.addClass("k-align-" + options.align);
@@ -108,8 +113,11 @@
                     return element;
                 },
                 overflow: function (options) {
-                    var element = $('<li class="' + (options.mobile ? "" : BUTTON_GROUP) + ' k-overflow-group"></li>');
+                    var element = $('<li></li>');
+
                     components.buttonGroup.base(options, components.button.overflow, element);
+
+                    element.addClass((options.mobile ? "" : BUTTON_GROUP) + " k-overflow-group");
 
                     if (options.id) {
                         element.attr("id", options.id + "_overflow");
@@ -590,8 +598,16 @@
 
             remove: function(element) {
                 var commandElement = this.element.find(element),
-                    type = commandElement.data("type"),
+                    type, uid;
+
+                if (!commandElement.length && this.options.resizable) {
+                    commandElement = this.popup.element.find(element);
+                    uid = commandElement.parent().attr(KENDO_UID_ATTR);
+                } else {
                     uid = commandElement.attr(KENDO_UID_ATTR);
+                }
+
+                type = commandElement.data("type");
 
                 if (commandElement.parent("." + SPLIT_BUTTON).data("type")) {
                     type = "splitButton";
@@ -603,7 +619,7 @@
                 }
 
                 commandElement
-                    .add(this.popup.element.find("[" + KENDO_UID_ATTR + "='" + commandElement.attr(KENDO_UID_ATTR) + "']"))
+                    .add(this.popup.element.find("[" + KENDO_UID_ATTR + "='" + uid + "']"))
                     .remove();
             },
 
@@ -716,7 +732,7 @@
             },
 
             _toggleOverflowAnchor: function() {
-                if (this.popup.element.children(":not(." + OVERFLOW_HIDDEN + ")").length > 0) {
+                if (this.popup.element.children(":not(." + OVERFLOW_HIDDEN + ", ." + POPUP + ")").length > 0) {
                     this.overflowAnchor.css({
                         visibility: "visible",
                         width: ""
@@ -747,7 +763,7 @@
                     target = $(e.target).closest("." + OVERFLOW_BUTTON, that.popup.container);
                 }
 
-                isDisabled = target.hasClass(STATE_DISABLED);
+                isDisabled = target.hasClass(OVERFLOW_BUTTON) ? target.parent("li").hasClass(STATE_DISABLED) : target.hasClass(STATE_DISABLED);
 
                 if (isDisabled) {
                     return;
@@ -795,6 +811,10 @@
                     isDefaultPrevented;
 
                 e.preventDefault();
+
+                if (splitButton.hasClass(STATE_DISABLED)) {
+                    return;
+                }
 
                 if (popup.element.is(":visible")) {
                     isDefaultPrevented = this.trigger(CLOSE, { target: splitButton });

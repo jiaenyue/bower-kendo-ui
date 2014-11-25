@@ -1,21 +1,25 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
-    define([ "./kendo.data", "./kendo.editable", "./kendo.selectable" ], f);
+    define([ "./kendo.data", "./kendo.editable", "./kendo.selectable.js" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "listview",
+    name: "ListView",
+    category: "web",
+    description: "The ListView widget offers rich support for interacting with data.",
+    depends: [ "data" ],
+    features: [ {
+        id: "listview-editing",
+        name: "Editing",
+        description: "Support for record editing",
+        depends: [ "editable" ]
+    }, {
+        id: "listview-selection",
+        name: "Selection",
+        description: "Support for selection",
+        depends: [ "selectable" ]
+    } ]
+};
 
 (function($, undefined) {
     var kendo = window.kendo,
@@ -196,9 +200,18 @@
 
                     if (item.length > 0) {
                         idx = item.index();
+
+                        that.angular("cleanup", function() {
+                            return { elements: [ item ]};
+                        });
+
                         item.replaceWith(template(data));
                         item = that.items().eq(idx);
                         item.attr(kendo.attr("uid"), data.uid);
+
+                        that.angular("compile", function() {
+                            return { elements: [ item ], data: [ { dataItem: data } ]};
+                        });
 
                         that.trigger("itemChange", {
                             item: item,
@@ -269,11 +282,7 @@
                 navigatable = that.options.navigatable;
 
             if (selectable) {
-                multi = typeof selectable === STRING && selectable.toLowerCase().indexOf("multiple") > -1;
-
-                if (multi) {
-                    that.element.attr("aria-multiselectable", true);
-                }
+                multi = kendo.ui.Selectable.parseOptions(selectable).multiple;
 
                 that.selectable = new kendo.ui.Selectable(that.element, {
                     aria: true,
@@ -512,6 +521,7 @@
            var that = this,
                editable = that.editable,
                data,
+               item,
                index,
                template = that.template,
                valid = true;
@@ -531,7 +541,12 @@
 
                    index = editable.element.index();
                    editable.element.replaceWith(template(data));
-                   that.items().eq(index).attr(kendo.attr("uid"), data.uid);
+                   item = that.items().eq(index);
+                   item.attr(kendo.attr("uid"), data.uid);
+
+                   if (that._hasBindingTarget()) {
+                        kendo.bind(item, data);
+                   }
                }
            }
 

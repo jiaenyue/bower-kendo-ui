@@ -1,22 +1,3 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-(function(f, define){
-    define([], f);
-})(function(){
-
 /* Validator */
 
 if (kendo.ui.Validator) {
@@ -148,6 +129,42 @@ $.extend(true, kendo.ui.ColorPicker.prototype.options.messages,{
 if (kendo.ui.FilterMenu) {
 kendo.ui.FilterMenu.prototype.options.operators =
 $.extend(true, kendo.ui.FilterMenu.prototype.options.operators,{
+  "string": {
+    "eq": "Е равно на",
+    "neq": "Не е равно на",
+    "startswith": "Започва с",
+    "contains": "Съдържа",
+    "doesnotcontain": "Не съдържа",
+    "endswith": "Завършва на"
+  },
+  "number": {
+    "eq": "Е равно на",
+    "neq": "Не е равно на",
+    "gte": "Е по-голяма или равно на",
+    "gt": "Е по-голямо от",
+    "lte": "Е по-малко или равно на",
+    "lt": "Е по-малко от"
+  },
+  "date": {
+    "eq": "Е равно на",
+    "neq": "Не е равно на",
+    "gte": "Е след или равно на",
+    "gt": "Е след",
+    "lte": "Е преди или равно на",
+    "lt": "Е преди"
+  },
+  "enums": {
+    "eq": "E равно на",
+    "neq": "Не е равно на"
+  }
+});
+}
+
+/* Filter cell operator messages */
+
+if (kendo.ui.FilterCell) {
+kendo.ui.FilterCell.prototype.options.operators =
+$.extend(true, kendo.ui.FilterCell.prototype.options.operators,{
   "string": {
     "eq": "Е равно на",
     "neq": "Не е равно на",
@@ -312,6 +329,19 @@ $.extend(true, kendo.ui.FilterMenu.prototype.options.messages,{
 });
 }
 
+/* FilterCell messages */
+
+if (kendo.ui.FilterCell) {
+kendo.ui.FilterCell.prototype.options.messages =
+$.extend(true, kendo.ui.FilterCell.prototype.options.messages,{
+  "filter": "Филтрирай",
+  "clear": "Премахни филтър",
+  "isFalse": "не е вярно",
+  "isTrue": "е вярно",
+  "operator": "Оператор"
+});
+}
+
 /* Groupable messages */
 
 if (kendo.ui.Groupable) {
@@ -458,8 +488,3 @@ $.extend(true, kendo.ui.Scheduler.prototype.options.messages,{
   "showWorkDay": "Покажи работни часове"
 });
 }
-
-
-return window.kendo;
-
-}, typeof define == 'function' && define.amd ? define : function(_, f){ f(); });

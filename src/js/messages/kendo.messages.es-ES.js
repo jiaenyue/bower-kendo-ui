@@ -1,23 +1,40 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-(function(f, define){
-    define([], f);
-})(function(){
 
 
+/* Filter cell operator messages */
+
+if (kendo.ui.FilterCell) {
+kendo.ui.FilterCell.prototype.options.operators =
+$.extend(true, kendo.ui.FilterCell.prototype.options.operators,{
+  "date": {
+    "eq": "Es igual a",
+    "gte": "Es posterior o igual a",
+    "gt": "Es posterior",
+    "lte": "Es anterior o igual a",
+    "lt": "Es anterior",
+    "neq": "No es igual a"
+  },
+  "number": {
+    "eq": "Es igual a",
+    "gte": "Es mayor o igual que",
+    "gt": "Es mayor que",
+    "lte": "Es menor o igual que",
+    "lt": "Es menor que",
+    "neq": "No es igual a"
+  },
+  "string": {
+    "endswith": "Termina en",
+    "eq": "Es igual a",
+    "neq": "No es igual a",
+    "startswith": "Comienza con",
+    "contains": "Contiene",
+    "doesnotcontain": "No contiene"
+  },
+  "enums": {
+    "eq": "Es igual a",
+    "neq": "No es igual a"
+  }
+});
+}
 
 /* Filter menu operator messages */
 
@@ -48,7 +65,7 @@ $.extend(true, kendo.ui.FilterMenu.prototype.options.operators,{
     "contains": "Contiene",
     "doesnotcontain": "No contiene"
   },
-  "enum": {
+  "enums": {
     "eq": "Es igual a",
     "neq": "No es igual a"
   }
@@ -165,6 +182,19 @@ $.extend(true, kendo.ui.Pager.prototype.options.messages,{
   "next": "Ir a la página siguiente",
   "previous": "Ir a la página anterior",
   "morePages": "Mas paginas"
+});
+}
+
+/* FilterCell messages */
+
+if (kendo.ui.FilterCell) {
+kendo.ui.FilterCell.prototype.options.messages =
+$.extend(true, kendo.ui.FilterCell.prototype.options.messages,{
+  "filter": "Filtrar",
+  "clear": "Limpiar filtro",
+  "isFalse": "No",
+  "isTrue": "Si",
+  "operator": "Operador"
 });
 }
 
@@ -337,7 +367,3 @@ $.extend(true, kendo.ui.Upload.prototype.options.localization,{
   "uploadSelectedFiles": "Upload files"
 });
 }
-
-return window.kendo;
-
-}, typeof define == 'function' && define.amd ? define : function(_, f){ f(); });

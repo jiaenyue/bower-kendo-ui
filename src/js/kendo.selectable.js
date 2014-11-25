@@ -1,21 +1,14 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
-    define([ "./kendo.core", "./kendo.userevents" ], f);
+    define([ "./kendo.core", "./kendo.userevents.js" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "selectable",
+    name: "Selectable",
+    category: "framework",
+    depends: [ "core", "userevents" ],
+    advanced: true
+};
 
 (function ($, undefined) {
     var kendo = window.kendo,
@@ -61,6 +54,11 @@
             that.relatedTarget = that.options.relatedTarget;
 
             multiple = that.options.multiple;
+
+            if (this.options.aria && multiple) {
+                that.element.attr("aria-multiselectable", true);
+            }
+
             that.userEvents = new kendo.UserEvents(that.element, {
                 global: true,
                 allowSelection: true,
@@ -167,6 +165,8 @@
                 currentElement = target.closest(that.element);
                 that._items = currentElement.find(that.options.filter);
             }
+
+            e.sender.capture();
 
             that._marquee
                 .appendTo(document.body)
@@ -388,6 +388,15 @@
             that._marquee = that._lastActive = that.element = that.userEvents = null;
         }
     });
+
+    Selectable.parseOptions = function(selectable) {
+        var asLowerString = typeof selectable === "string" && selectable.toLowerCase();
+
+        return {
+            multiple: asLowerString && asLowerString.indexOf("multiple") > -1,
+            cell: asLowerString && asLowerString.indexOf("cell") > -1
+        };
+    };
 
     function collision(element, position) {
         var elementPosition = kendo.getOffset(element),

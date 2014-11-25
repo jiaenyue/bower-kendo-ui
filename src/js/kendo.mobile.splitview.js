@@ -1,21 +1,14 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
     define([ "./kendo.mobile.pane" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "mobile.splitview",
+    name: "SplitView",
+    category: "mobile",
+    description: "The mobile SplitView is a tablet-specific view that consists of two or more mobile Pane widgets.",
+    depends: [ "mobile.pane" ]
+};
 
 (function($, undefined) {
     var kendo = window.kendo,
@@ -26,7 +19,8 @@
 
     var SplitView = View.extend({
         init: function(element, options) {
-            var that = this, pane;
+            var that = this,
+            pane, modalViews;
 
             Widget.fn.init.call(that, element, options);
             element = that.element;
@@ -34,18 +28,40 @@
             $.extend(that, options);
 
             that._id();
-            that._layout();
-            that._overlay();
+
+            if (!that.options.$angular) {
+                that._layout();
+                that._overlay();
+            } else {
+                that._overlay();
+            }
+
             that._style();
-            kendo.mobile.init(element.children(kendo.roleSelector("modalview")));
+
+            modalViews = element.children(that._locate("modalview"));
+
+            if (!that.options.$angular) {
+                kendo.mobile.init(modalViews);
+            } else {
+                modalViews.each(function(idx, element) {
+                    kendo.compileMobileDirective($(element));
+                });
+            }
 
             that.panes = [];
             that._paramsHistory = [];
 
-            that.content.children(kendo.roleSelector("pane")).each(function() {
-                pane = kendo.initWidget(this, {}, ui.roles);
-                that.panes.push(pane);
-            });
+            if (!that.options.$angular) {
+                that.content.children(kendo.roleSelector("pane")).each(function() {
+                    pane = kendo.initWidget(this, {}, ui.roles);
+                    that.panes.push(pane);
+                });
+            } else {
+                that.element.children(kendo.directiveSelector("pane")).each(function() {
+                    pane = kendo.compileMobileDirective($(this));
+                    that.panes.push(pane);
+                });
+            }
 
             that.expandedPaneShim = $(EXPANED_PANE_SHIM).appendTo(that.element);
 
@@ -54,6 +70,10 @@
                     that.collapsePanes();
                 }
             });
+        },
+
+        _locate: function(selectors) {
+            return this.options.$angular ? kendo.directiveSelector(selectors) : kendo.roleSelector(selectors);
         },
 
         options: {

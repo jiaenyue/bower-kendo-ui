@@ -1,21 +1,14 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
-    define([ "./kendo.core", "./kendo.userevents" ], f);
+    define([ "./kendo.core", "./kendo.userevents.js" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "draganddrop",
+    name: "Drag & drop",
+    category: "framework",
+    description: "Drag & drop functionality for any DOM element.",
+    depends: [ "core", "userevents" ]
+};
 
 (function ($, undefined) {
     var kendo = window.kendo,
@@ -643,7 +636,7 @@
 
         options: {
             name: "Draggable",
-            distance: 5,
+            distance: ( kendo.support.touch ? 0 : 5),
             group: "default",
             cursorOffset: null,
             axis: null,
@@ -761,6 +754,8 @@
                 that.userEvents.cancel();
                 that._afterEnd();
             }
+
+            that.userEvents.capture();
 
             $(document).on(KEYUP, that._captureEscape);
         },

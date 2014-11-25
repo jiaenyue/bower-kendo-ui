@@ -1,21 +1,14 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
-    define([ "./kendo.data", "./kendo.userevents", "./kendo.mobile.button" ], f);
+    define([ "./kendo.data", "./kendo.userevents.js", "./kendo.mobile.button" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "mobile.listview",
+    name: "ListView",
+    category: "mobile",
+    description: "The Kendo Mobile ListView widget is used to display flat or grouped list of items.",
+    depends: [ "data", "userevents", "mobile.button" ]
+};
 
 (function($, undefined) {
     var kendo = window.kendo,
@@ -209,9 +202,9 @@
                         handler.dataSource.read(pullParameters.call(listView, handler._first));
                     }
                 },
-                pullTemplate: options.pullTemplate,
-                releaseTemplate: options.releaseTemplate,
-                refreshTemplate: options.refreshTemplate
+                pullTemplate: options.messages.pullTemplate,
+                releaseTemplate: options.messages.releaseTemplate,
+                refreshTemplate: options.messages.refreshTemplate
             });
         },
 
@@ -530,7 +523,7 @@
         init: function(listView, buffer) {
 
             this._loadIcon = $(LOAD_ICON).hide();
-            this._loadButton = $('<a class="km-load">' + listView.options.loadMoreText + '</a>').hide();
+            this._loadButton = $('<a class="km-load">' + listView.options.messages.loadMoreText + '</a>').hide();
             this.element = $('<li class="km-load-more" style="display: none"></li>').append(this._loadIcon).append(this._loadButton).appendTo(listView.element);
 
             var loadMore = this;
@@ -952,13 +945,15 @@
             headerTemplate: '<span class="km-text">#:value#</span>',
             appendOnRefresh: false,
             loadMore: false,
-            loadMoreText: "Press to load more",
             endlessScroll: false,
             scrollThreshold: 30,
             pullToRefresh: false,
-            pullTemplate: "Pull to refresh",
-            releaseTemplate: "Release to refresh",
-            refreshTemplate: "Refreshing",
+            messages: {
+                loadMoreText: "Press to load more",
+                pullTemplate: "Pull to refresh",
+                releaseTemplate: "Release to refresh",
+                refreshTemplate: "Refreshing"
+            },
             pullOffset: 140,
             filterable: false,
             virtualViewSize: null
@@ -1046,15 +1041,6 @@
                         listView.trigger(ITEM_CHANGE, { item: items.eq(i), data: dataItems[i], ns: ui });
                     }
                 }
-
-                listView.angular("compile", function(){
-                    return {
-                        elements: items,
-                        data: dataItems.map(function(data){
-                            return { dataItem: data };
-                        })
-                    };
-                });
             });
         },
 
@@ -1121,6 +1107,16 @@
 
         _renderItems: function(dataItems, callback) {
             var items = $(kendo.render(this.template, dataItems));
+
+            this.angular("compile", function(){
+                return {
+                    elements: items,
+                    data: dataItems.map(function(data){
+                        return { dataItem: data };
+                    })
+                };
+            });
+
             callback(items);
             mobile.init(items);
             this._enhanceItems(items);

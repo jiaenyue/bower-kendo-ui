@@ -1,21 +1,14 @@
-/**
- * Copyright 2014 Telerik AD
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 (function(f, define){
     define([ "./kendo.fx", "./kendo.draganddrop" ], f);
 })(function(){
+
+var __meta__ = {
+    id: "mobile.scroller",
+    name: "Scroller",
+    category: "mobile",
+    description: "The Kendo Mobile Scroller widget enables touch friendly kinetic scrolling for the contents of a given DOM element.",
+    depends: [ "fx", "draganddrop" ]
+};
 
 (function($, undefined) {
     var kendo = window.kendo,
@@ -470,9 +463,11 @@
             mousewheelScrolling: true,
             avoidScrolling: function() { return false; },
             pullToRefresh: false,
-            pullTemplate: "Pull to refresh",
-            releaseTemplate: "Release to refresh",
-            refreshTemplate: "Refreshing"
+            messages: {
+                pullTemplate: "Pull to refresh",
+                releaseTemplate: "Release to refresh",
+                refreshTemplate: "Refreshing"
+            }
         },
 
         events: [
@@ -581,9 +576,9 @@
             var that = this;
 
             that.dimensions.y.forceEnabled();
-            that.pullTemplate = kendo.template(that.options.pullTemplate);
-            that.releaseTemplate = kendo.template(that.options.releaseTemplate);
-            that.refreshTemplate = kendo.template(that.options.refreshTemplate);
+            that.pullTemplate = kendo.template(that.options.messages.pullTemplate);
+            that.releaseTemplate = kendo.template(that.options.messages.releaseTemplate);
+            that.refreshTemplate = kendo.template(that.options.messages.refreshTemplate);
 
             that.scrollElement.prepend('<span class="km-scroller-pull"><span class="km-icon"></span><span class="km-loading-left"></span><span class="km-loading-right"></span><span class="km-template">' + that.pullTemplate({}) + '</span></span>');
             that.refreshHint = that.scrollElement.children().first();
